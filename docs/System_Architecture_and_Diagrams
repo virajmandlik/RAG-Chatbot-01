@@ -1,0 +1,82 @@
+# System Architecture & Design
+
+This document outlines the technical architecture, technology stack, and UML-style diagrams for the RAG Chatbot.
+
+## 1. High-Level Architecture
+The system is composed of three main parts: a Data Ingestion Pipeline that runs in the background, a RAG API Backend that serves user requests, and a Web Frontend that provides the user interface.
+
+### Architecture Diagram (Mermaid)
+```mermaid
+flowchart LR
+  subgraph GoogleDrive[Google Drive]
+    GD[Folder: Company Docs]
+  end
+
+  subgraph Backend[Backend Service]
+    DL[Document Loader]
+    TS[Text Splitter]
+    EM[Gemini Embedding]
+    VD[(Pinecone Vector DB)]
+    QA[Chat Model (Gemini/ChatGPT)]
+  end
+
+  subgraph Frontend[Web Frontend]
+    UI[Chat UI]
+  end
+
+  GD -- Webhook: file created/updated --> Backend
+  Backend --> DL
+  DL --> TS --> EM --> VD
+
+  UI -- Ask question --> Backend
+  Backend -- Embed query --> EM
+  EM -- Similarity search --> VD
+  VD -- Top K Context --> Backend
+  Backend -- Prompt with context --> QA
+  QA -- Answer --> Backend --> UI
+```
+
+## 2. Technical Stack
+- Backend: Python (FastAPI)
+- Frontend: React.js
+- Vector DB: Pinecone
+- LLMs & Embeddings: Google Gemini API (primary), OpenAI (optional)
+- Cloud: Google Cloud Run (backend), Vercel/Netlify (frontend)
+- Auth: Google OAuth (for Drive)
+- Containerization: Docker
+
+## 3. UML/Sequence Diagrams
+
+### 3.1 Use Case Overview (simplified)
+```mermaid
+flowchart TD
+  Employee((Employee))
+  Admin((System Administrator))
+
+  UC1[Ask Question]
+  UC2[Receive Answer]
+  UC3[Manage Documents]
+  UC4[Index Document]
+
+  Employee --> UC1 --> UC2
+  Admin --> UC3 --> UC4
+```
+
+### 3.2 Sequence Diagram (RAG Query Process)
+```mermaid
+sequenceDiagram
+  participant U as User (Frontend)
+  participant B as Backend
+  participant E as Embedding (Gemini)
+  participant V as Pinecone
+  participant L as LLM (Gemini/ChatGPT)
+
+  U->>B: POST /chat { query }
+  B->>E: Embed(query)
+  E-->>B: query_vector
+  B->>V: query(top_k)
+  V-->>B: matches (context)
+  B->>L: prompt(query + context)
+  L-->>B: answer
+  B-->>U: answer
+```
