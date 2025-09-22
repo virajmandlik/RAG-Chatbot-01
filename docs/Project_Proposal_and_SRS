@@ -1,0 +1,51 @@
+# Project Proposal & Software Requirements Specification (SRS)
+
+## 1. Project Overview
+### 1.1 Introduction
+This document outlines the project proposal and software requirements for building a Retrieval-Augmented Generation (RAG) chatbot. The system is designed to provide employees with an intelligent, conversational interface to access information stored in internal company documents. It will leverage Google Drive for document storage, Pinecone as a vector database, and Large Language Models (LLMs) like Google's Gemini and optionally OpenAI's GPT for generating answers. The project aims to convert the logic prototyped in an n8n workflow into a scalable, production-ready application.
+
+### 1.2 Business Problem
+Employees often spend significant time searching for information within company policy documents, HR manuals, technical specifications, and other internal resources. This process can be inefficient and lead to inconsistent answers. An AI-powered chatbot can centralize this knowledge, providing instant, accurate, and context-aware responses 24/7, thereby increasing productivity and improving employee experience.
+
+### 1.3 Goals and Objectives
+- Goal: To develop an intelligent chatbot that accurately answers employee questions based on a secure, internal knowledge base.
+- Objective 1: Automate the ingestion and processing of documents from a designated Google Drive folder.
+- Objective 2: Implement a robust RAG pipeline for retrieving relevant information and generating human-like answers.
+- Objective 3: Provide a simple and intuitive web-based chat interface for employees.
+- Objective 4: Ensure the system is modular, allowing for different LLMs (e.g., Gemini, ChatGPT) to be used.
+
+## 2. Scope
+### 2.1 In-Scope
+- Automatic synchronization (ingestion and vectorization) of files (.pdf, .docx, .txt, .md) from a specific Google Drive folder.
+- The system will trigger on file creation and updates in the specified folder.
+- A backend service to handle document processing, RAG logic, and API requests.
+- A frontend web application with a chat interface.
+- Integration with Pinecone for vector storage and similarity search.
+- Integration with Google Gemini API for embeddings and text generation.
+- (Optional) Integration with OpenAI API (ChatGPT) as an alternative LLM.
+- Graceful handling of questions for which no answer can be found in the documents.
+
+### 2.2 Out-of-Scope
+- Advanced user role management and document-level access control.
+- An admin dashboard for managing documents or viewing analytics.
+- Support for document formats other than those listed above (e.g., images, spreadsheets).
+- Direct editing or modification of documents within the application.
+
+## 3. Functional Requirements (FR)
+- FR1: Automatic Document Ingestion — Monitor a specified Google Drive folder and trigger processing on create/update.
+- FR2: Document Processing — Extract text, split into chunks, and generate embeddings.
+- FR3: Vector Storage — Store text chunks and embeddings in Pinecone.
+- FR4: User Chat Interface — Provide a web-based interface for questions.
+- FR5: Query Processing — Generate a vector for user queries.
+- FR6: Information Retrieval — Similarity search in Pinecone to retrieve context.
+- FR7: Answer Generation — Pass context and query to LLM to generate answers.
+- FR8: Conversation History — Maintain a history for follow-up questions.
+- FR9: Handling Out-of-Context Questions — Respond appropriately when no answer is found.
+- FR10: Configurable LLM — Allow switching between supported LLMs via config.
+
+## 4. Non-Functional Requirements (NFR)
+- NFR1: Performance — Average response under 8 seconds.
+- NFR2: Security — Store API keys and credentials securely (env vars), not hardcoded.
+- NFR3: Scalability — Handle at least 1,000 documents and 50 concurrent users.
+- NFR4: Usability — Clean, intuitive chat interface for non-technical employees.
+- NFR5: Maintainability — Well-documented, modular code following best practices.
